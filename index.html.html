@@ -1,0 +1,760 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Professional Website</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+    <link rel="stylesheet" href="index.css">
+    <script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+            if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+                try {
+                    var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                    var firstSheetName = workbook.SheetNames[0];
+                    var worksheet = workbook.Sheets[firstSheetName];
+                    var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                    var filteredData = jsonData.filter(row => row.some(filledCell));
+                    var headerRowIndex = filteredData.findIndex((row, index) =>
+                      row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                    );
+                    if (headerRowIndex === -1 || headerRowIndex > 25) {
+                      headerRowIndex = 0;
+                    }
+                    var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex));
+                    csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                    return csv;
+                } catch (e) {
+                    console.error(e);
+                    return "";
+                }
+            }
+            return gk_fileData[filename] || "";
+        }
+    </script>
+    <style>
+        .table-cell-truncate {
+            max-width: 150px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .content-page-wrapper {
+            min-height: calc(100vh - 73px - 0px);
+            display: flex;
+            flex-direction: column;
+        }
+        #home.content-page {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        .content-page-container-for-flip {}
+        @keyframes slideDownIn {
+            from {
+                transform: translateY(-30px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0px);
+                opacity: 1;
+            }
+        }
+        .page-enter-animation {
+            animation: slideDownIn 0.5s ease-out forwards;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-r from-[#0D9488] to-[#075985] min-h-screen flex">
+    <!-- Sidebar -->
+    <aside id="sidebar" class="w-64 bg-[#4682B4] shadow-lg h-screen fixed">
+        <div class="p-6">
+            <div class="flex justify-center items-center mb-6">
+                <h2 class="text-2xl font-bold text-white">Menu</h2>
+            </div>
+            <nav>
+                <ul class="space-y-3">
+                    <li><a href="#home" class="block p-3 text-white bg-[#5A9BD4] hover:bg-[#0D9488] rounded-md border border-gray-200 shadow-sm transition flex items-center justify-center nav-link" data-page-id="home"><span class="inline-block">Home</span></a></li>
+                    <li><a href="#task" class="block p-3 text-white bg-[#5A9BD4] hover:bg-[#0D9488] rounded-md border border-gray-200 shadow-sm transition flex items-center justify-center nav-link" data-page-id="task"><span class="inline-block">Task</span></a></li>
+                    <li><a href="#performance-appraisal" class="block p-3 text-white bg-[#5A9BD4] hover:bg-[#0D9488] rounded-md border border-gray-200 shadow-sm transition flex items-center justify-center nav-link" data-page-id="performance-appraisal"><span class="inline-block">Performance Appraisal</span></a></li>
+                    <li><a href="#checklist" class="block p-3 text-white bg-[#5A9BD4] hover:bg-[#0D9488] rounded-md border border-gray-200 shadow-sm transition flex items-center justify-center nav-link" data-page-id="checklist"><span class="inline-block">Checklist</span></a></li>
+                    <li><a href="#work-status" class="block p-3 text-white bg-[#5A9BD4] hover:bg-[#0D9488] rounded-md border border-gray-200 shadow-sm transition flex items-center justify-center nav-link" data-page-id="work-status"><span class="inline-block">Work Status</span></a></li>
+                    <li><a href="#ceo-meeting-request" class="block p-3 text-white bg-[#5A9BD4] hover:bg-[#0D9488] rounded-md border border-gray-200 shadow-sm transition flex items-center justify-center nav-link" data-page-id="ceo-meeting-request"><span class="inline-block">CEO Meeting Request</span></a></li>
+                    <li><a href="#reports" class="block p-3 text-white bg-[#5A9BD4] hover:bg-[#0D9488] rounded-md border border-gray-200 shadow-sm transition flex items-center justify-center nav-link" data-page-id="reports"><span class="inline-block">Reports</span></a></li>
+                    <li><a href="#analytics" class="block p-3 text-white bg-[#5A9BD4] hover:bg-[#0D9488] rounded-md border border-gray-200 shadow-sm transition flex items-center justify-center nav-link" data-page-id="analytics"><span class="inline-block">Analytics</span></a></li>
+                    <li><a href="#settings" class="block p-3 text-white bg-[#5A9BD4] hover:bg-[#0D9488] rounded-md border border-gray-200 shadow-sm transition flex items-center justify-center nav-link" data-page-id="settings"><span class="inline-block">Settings</span></a></li>
+                    <li><a href="#help" class="block p-3 text-white bg-[#5A9BD4] hover:bg-[#0D9488] rounded-md border border-gray-200 shadow-sm transition flex items-center justify-center nav-link" data-page-id="help"><span class="inline-block">Help</span></a></li>
+                </ul>
+            </nav>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="ml-64 flex-1">
+        <div id="userInfoHeader" class="bg-gray-800 p-4 shadow-md flex justify-between items-center">
+            <h1 id="currentPageTitle" class="text-xl font-semibold text-gray-100">Home</h1>
+        </div>
+        <div class="content-page-wrapper">
+            <div class="bg-white rounded-lg content-page-container-for-flip">
+                <!-- Home Page -->
+                <div id="home" class="content-page p-4 md:p-6 bg-slate-100">
+                    <div class="mb-4">
+                        <h1 class="text-2xl md:text-3xl font-bold text-gray-800">Welcome!</h1>
+                        <p id="dashboardDate" class="text-sm text-gray-500">Loading date...</p>
+                    </div>
+                    <div id="dashboardGrid" class="flex-grow grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5"></div>
+                </div>
+
+                <!-- Task Page -->
+                <div id="task" class="content-page hidden p-6 bg-white">
+                    <h1 class="text-3xl font-bold text-gray-800 mb-4 text-center">Task Management</h1>
+                    <p class="text-gray-600 mb-6 text-center">Manage your tasks efficiently with our intuitive task management system.</p>
+                    <div class="bg-gray-50 p-6 rounded-lg shadow">
+                        <h3 class="text-xl font-semibold text-gray-800 mb-2">Task List</h3>
+                        <ul class="list-disc list-inside text-gray-600">
+                            <li>Create and assign tasks</li>
+                            <li>Set deadlines and priorities</li>
+                            <li>Track task progress</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Performance Appraisal Page -->
+                <div id="performance-appraisal" class="content-page hidden p-6 bg-white">
+                    <h1 class="text-3xl font-bold text-gray-800 mb-4 text-center">Performance Appraisal</h1>
+                    <p class="text-gray-600 mb-6 text-center">Evaluate and improve employee performance with our appraisal tools.</p>
+                    <div class="bg-gray-50 p-6 rounded-lg shadow">
+                        <h3 class="text-xl font-semibold text-gray-800 mb-2">Appraisal Features</h3>
+                        <ul class="list-disc list-inside text-gray-600">
+                            <li>Conduct performance reviews</li>
+                            <li>Set performance goals</li>
+                            <li>Provide feedback</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Checklist Page -->
+                <div id="checklist" class="content-page hidden p-6 bg-white">
+                    <h1 class="text-3xl font-bold text-gray-800 mb-4 text-center">Checklist</h1>
+                    <p class="text-gray-600 mb-6 text-center">Stay organized with customizable checklists for your projects.</p>
+                    <div class="bg-gray-50 p-6 rounded-lg shadow">
+                        <h3 class="text-xl font-semibold text-gray-800 mb-2">Checklist Tools</h3>
+                        <ul class="list-disc list-inside text-gray-600">
+                            <li>Create checklists for tasks</li>
+                            <li>Mark items as complete</li>
+                            <li>Share checklists with team</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Work Status Page -->
+                <div id="work-status" class="content-page hidden p-6 bg-white">
+                    <h1 class="text-3xl font-bold text-gray-800 mb-4 text-center">Work Status</h1>
+                    <p class="text-gray-600 mb-6 text-center">Track the status of your projects and tasks in real-time with visual dashboards.</p>
+                    <div class="bg-gray-50 p-6 rounded-lg shadow">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div>
+                                <h3 class="text-xl font-semibold text-gray-800 mb-3">Project Completion Progress</h3>
+                                <div class="bg-white p-4 rounded-md shadow-inner h-72 md:h-96">
+                                    <canvas id="projectProgressChart"></canvas>
+                                </div>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-semibold text-gray-800 mb-3">Task Distribution by Status</h3>
+                                <div class="bg-white p-4 rounded-md shadow-inner h-72 md:h-96 flex justify-center items-center">
+                                    <canvas id="taskDistributionChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CEO Meeting Request Page -->
+                <div id="ceo-meeting-request" class="content-page hidden p-6 bg-white">
+                    <h1 class="text-3xl font-bold text-gray-800 mb-4 text-center">CEO Meeting Request</h1>
+                    <p class="text-gray-600 mb-6 text-center">Schedule meetings with the CEO efficiently.</p>
+                    <div class="bg-gray-50 p-6 rounded-lg shadow">
+                        <h3 class="text-xl font-semibold text-gray-800 mb-2">Meeting Features</h3>
+                        <ul class="list-disc list-inside text-gray-600">
+                            <li>Submit meeting requests</li>
+                            <li>View CEO's availability</li>
+                            <li>Receive confirmation</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Reports Page -->
+                <div id="reports" class="content-page hidden p-6 bg-white">
+                    <h1 class="text-3xl font-bold text-gray-800 mb-4 text-center">Reports</h1>
+                    <p class="text-gray-600 mb-6 text-center">Generate and view detailed visual reports for your business.</p>
+                    <div class="bg-gray-50 p-6 rounded-lg shadow">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div>
+                                <h3 class="text-xl font-semibold text-gray-800 mb-3">Monthly Revenue Trends</h3>
+                                <div class="bg-white p-4 rounded-md shadow-inner h-72 md:h-96">
+                                    <canvas id="monthlyRevenueChart"></canvas>
+                                </div>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-semibold text-gray-800 mb-3">Department Performance Metrics</h3>
+                                <div class="bg-white p-4 rounded-md shadow-inner h-72 md:h-96 flex justify-center items-center">
+                                    <canvas id="departmentPerformanceChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Analytics Page -->
+                <div id="analytics" class="content-page hidden p-6 bg-white">
+                    <h1 class="text-3xl font-bold text-gray-800 mb-4 text-center">Analytics Dashboard</h1>
+                    <p class="text-gray-600 mb-6 text-center">Gain insights with our powerful analytics tools and visualizations.</p>
+                    <div class="bg-gray-50 p-6 rounded-lg shadow">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div>
+                                <h3 class="text-xl font-semibold text-gray-800 mb-3">User Activity Over Time</h3>
+                                <div class="bg-white p-4 rounded-md shadow-inner h-72 md:h-96">
+                                    <canvas id="userActivityChart"></canvas>
+                                </div>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-semibold text-gray-800 mb-3">Feature Usage Breakdown</h3>
+                                <div class="bg-white p-4 rounded-md shadow-inner h-72 md:h-96 flex justify-center items-center">
+                                    <canvas id="featureUsageChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Settings Page -->
+                <div id="settings" class="content-page hidden p-6 bg-slate-100">
+                    <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">Edit Application Page Content</h1>
+                    <div class="my-4 text-center sm:text-left">
+                        <button id="revert-all-changes"
+                                class="px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-md shadow-md transition duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50"
+                                aria-label="Revert all page content to original and clear any locally saved changes">
+                            Revert All Pages to Original & Clear Local Saves
+                        </button>
+                    </div>
+                    <div class="my-8">
+                        <div id="html-snippets-container"></div>
+                    </div>
+                    <div id="consolidated-output-area" class="mt-12 pt-8 border-t-2 border-teal-200 hidden">
+                        <h2 class="text-2xl font-semibold text-gray-800 mb-4">Final HTML for File Update</h2>
+                        <div class="p-3xl">
+                            <p class="text-gray-600 mb-4">
+                                After making all your edits above and clicking "Save code" for each, the HTML content for your pages is shown below.
+                                Changes are also saved locally in your browser. To permanently save these changes to your <code>index.html</code> file:
+                                </p>
+                            <ol class="list-decimal list-inside text-gray-600 mb-4 pl-4 rounded">
+                                <li>Ensure all sections above are saved (locally and on-page) and look correct on their respective pages.</li>
+                                <li>Copy the <strong>entire content</strong> from the text box below.</li>
+                                <li>Provide this copied text to the AI assistant and request an updated <code>index.html</code> file.</li>
+                            </ol>
+                            <textarea id="consolidated-html-display" readonly
+                                class="w-full h-[500px] rounded-lg p-3 border border-gray-300 font-mono text-sm bg-gray-50 shadow-inner focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+                                aria-label="true"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Help Page -->
+                <div id="help" class="content-page hidden p-6 bg-white">
+                    <h1 class="text-3xl font-bold text-gray-800 mb-4 text-center">Help</h1>
+                    <p class="text-gray-600 mb-6 text-center">Find support and resources to use our apps effectively.</p>
+                    <div class="bg-gray-50 p-6 rounded shadow-sm">
+                        <h3 class="text-xl font-semibold mb-2 text-center">Support this Resource</h3>
+                        <ul class="list-disc list-inside text-gray-600">
+                            <li>FAQs</li>
+                            <li>User guides</li>
+                            <li>Contact support</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // --- Constants and Configuration ---
+        const STORAGE_PREFIX = 'page_content';
+        let activeCharts = {};
+        const contentPages = document.querySelectorAll('.content-page');
+        const navLinks = document.querySelectorAll('.nav-link');
+        const currentPageTitleElement = document.getElementById('currentPageTitle');
+
+        // --- Utility Functions ---
+        function isVoidTag(tagString) {
+            const voidTagNames = ['area', 'base', 'br', 'col', 'command', 'embed', 'hr', 'img', 'input', 'keygen', 'link', 'meta', 'param', 'source', 'track', 'wbr'];
+            const match = tagString.match(/^<([\w\-]+)/);
+            if (!match) return null;
+            return voidTagNames.includes(match[1].toLowerCase()) || tagString.endsWith('/>');
+        }
+
+        function formatHtmlForTextarea(htmlString) {
+            let indentLevel = 0;
+            const indentUnit = '  ';
+            let result = '';
+            const tokens = htmlString.match(/<\/[^>]+>|<[^>]+>|[^<]+/g) || [];
+            tokens.forEach(token => {
+                const trimmedToken = token.trim();
+                if (!trimmedToken) return;
+                if (trimmedToken.startsWith('</')) {
+                    indentLevel = Math.max(0, indentLevel - 1);
+                    result += indentUnit.repeat(indentLevel) + trimmedToken + '\n';
+                } else if (trimmedToken.startsWith('<')) {
+                    const isVoid = isVoidTag(trimmedToken);
+                    result += indentUnit.repeat(indentLevel) + trimmedToken + '\n';
+                    if (!isVoid && !trimmedToken.endsWith('/>')) indentLevel++;
+                } else {
+                    result += indentUnit.repeat(indentLevel) + trimmedToken + '\n';
+                }
+            });
+            return result.trim();
+        }
+
+        // --- Page Content Persistence ---
+        function loadContentFromLocalStorage(pageId) {
+            const pageElement = document.getElementById(pageId);
+            if (!pageElement) return;
+            const storedHtml = localStorage.getItem(STORAGE_PREFIX + pageId);
+            if (storedHtml !== null && pageId !== 'home') {
+                pageElement.innerHTML = storedHtml;
+                const scripts = Array.from(pageElement.getElementsByTagName('script'));
+                scripts.forEach(script => {
+                    if (!script.parentNode) return;
+                    const newScript = document.createElement('script');
+                    Array.from(script.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
+                    if (script.textContent) newScript.textContent = script.textContent;
+                    script.parentNode.replaceChild(newScript, script);
+                });
+            }
+        }
+
+        function saveContentToLocalStorage(pageId, htmlContent) {
+            try {
+                if (pageId !== 'home') {
+                    localStorage.setItem(STORAGE_PREFIX + pageId, htmlContent);
+                }
+            } catch (e) {
+                console.error("Error saving to localStorage:", e);
+                alert("Could not save changes to local storage.");
+            }
+        }
+
+        function clearAllPageContentFromLocalStorage() {
+            contentPages.forEach(page => {
+                const pageId = page.id;
+                if (pageId && pageId !== 'home') {
+                    localStorage.removeItem(STORAGE_PREFIX + pageId);
+                }
+            });
+        }
+
+        contentPages.forEach(page => {
+            if (page.id) {
+                loadContentFromLocalStorage(page.id);
+            }
+        });
+
+        function updateConsolidatedHtmlDisplay() {
+            const consolidatedDisplay = document.getElementById('consolidated-html-display');
+            const instructionsContainer = document.getElementById('consolidated-output-area');
+            if (!consolidatedDisplay || !instructionsContainer) return;
+            let combinedOuterHtml = '';
+            document.querySelectorAll('main > div > div > div.content-page').forEach(page => {
+                if (page.id && page.id !== 'home') {
+                    combinedOuterHtml += page.outerHTML + '\n';
+                }
+            });
+            consolidatedDisplay.textContent = combinedOuterHtml.trim();
+            instructionsContainer.classList.remove('hidden');
+        }
+
+        function populateHtmlCodeSnippets() {
+            const container = document.getElementById('html-snippets-container');
+            if (!container) return;
+            container.innerHTML = '';
+
+            document.querySelectorAll('aside .nav-link').forEach(link => {
+                const targetId = link.getAttribute('data-page-id');
+                const sectionNameElement = link.querySelector('span');
+                const sectionName = sectionNameElement?.textContent.trim() || 'Unknown Section';
+                if (targetId === 'home') return;
+                const sectionElement = document.getElementById(targetId);
+                if (!sectionElement) return;
+                const snippetContainer = document.createElement('div');
+                snippetContainer.className = 'code-block-container relative mb-8';
+                const titleElement = document.createElement('h3');
+                titleElement.className = 'text-xl font-semibold text-gray-700 mb-0';
+                titleElement.textContent = `${sectionName} HTML Content`;
+                const textareaElement = document.createElement('textarea');
+                textareaElement.className = 'w-full h-[400px] p-3 rounded-md border border-gray-300 font-mono text-sm bg-gray-50 shadow-inner focus:outline-none focus:ring-2 focus:ring-teal-500';
+                textareaElement.setAttribute('aria-label', `HTML content for ${sectionName}`);
+                textareaElement.textContent = formatHtmlForTextarea(sectionElement.innerHTML);
+                const saveButton = document.createElement('button');
+                saveButton.textContent = 'Save Code';
+                saveButton.className = 'mt-3 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-md font-semibold transition';
+                saveButton.setAttribute('data-target-id', targetId);
+                const feedbackElement = document.createElement('span');
+                feedbackElement.className = 'ml-2 text-sm font-semibold opacity-0 transition-opacity duration-2';
+                feedbackElement.textContent = 'Saved!';
+                saveButton.addEventListener('click', () => {
+                    const targetSectionId = saveButton.getAttribute('data-target-id');
+                    const updatedHtml = textareaElement.value;
+                    const targetElementToUpdate = document.getElementById(targetSectionId);
+                    if (targetElementToUpdate) {
+                        targetElementToUpdate.innerHTML = updatedHtml;
+                        const scripts = Array.from(targetElementToUpdate.getElementsByTagName('script'));
+                        scripts.forEach(script => {
+                            if (!script.parentNode) return;
+                            const newScript = document.createElement('script');
+                            Array.from(script.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
+                            if (script.textContent) newScript.textContent = script.textContent;
+                            script.parentNode.replaceChild(newScript, script);
+                        });
+                        saveContentToLocalStorage(targetSectionId, updatedHtml);
+                        feedbackElement.textContent = 'Code updated & saved locally.';
+                        feedbackElement.className = 'ml-3 text-sm font-semibold text-blue-700 opacity-100';
+                        setTimeout(() => {
+                            feedbackElement.className = 'ml-3 text-sm font-semibold text-green-600 opacity-0';
+                            feedbackElement.textContent = 'Saved!';
+                        }, 4000);
+                        updateConsolidatedHtmlDisplay();
+                    }
+                });
+                snippetContainer.appendChild(titleElement);
+                snippetContainer.appendChild(textareaElement);
+                const buttonContainer = document.createElement('div');
+                buttonContainer.className = 'flex items-center mt-3';
+                buttonContainer.appendChild(saveButton);
+                buttonContainer.appendChild(feedbackElement);
+                snippetContainer.appendChild(buttonContainer);
+                container.appendChild(snippetContainer);
+            });
+        }
+
+        function populateAllSourceCode() {
+            const settingsPage = document.getElementById('settings');
+            if (!settingsPage || settingsPage.classList.contains('hidden')) return;
+            populateHtmlCodeSnippets();
+            updateConsolidatedHtmlDisplay();
+            document.getElementById('consolidated-output-area')?.classList.remove('hidden');
+        }
+
+        document.getElementById('revert-all-changes')?.addEventListener('click', () => {
+            if (confirm('Revert all pages (except Home) and clear local saves?')) {
+                clearAllPageContentFromLocalStorage();
+                window.location.reload();
+            }
+        });
+
+        // --- Dashboard ---
+        function renderDashboard() {
+            const dashboardDateP = document.getElementById('dashboard-date');
+            const dashboardGrid = document.getElementById('dashboardGrid');
+            if (!dashboardGrid || !dashboardDateP) return;
+            const today = new Date();
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            dashboardDateP.textContent = today.toLocaleDateString(undefined, options);
+            dashboardGrid.innerHTML = '';
+            const appModulesConfig = [
+                { id: 'task', name: 'Tasks', icon: '📋', color: 'blue', statKey: 'pendingTasks', statLabel: 'Pending' },
+                { id: 'performance-appraisal', name: 'Appraisals', icon: '🌟', color: 'yellow' },
+                { id: 'checklist', name: 'Checklists', icon: '✅', color: 'green' },
+                { id: 'work-status', name: 'Work Status', icon: '📊', color: 'indigo' },
+                { id: 'ceo-meeting-request', name: 'CEO Meetings', icon: '📅', color: 'purple' },
+                { id: 'reports', name: 'Reports', icon: '📄', color: 'pink' },
+                { id: 'analytics', name: 'Analytics', icon: '📈', color: 'orange' },
+            ];
+            const dynamicStats = {
+                pendingTasks: Math.floor(Math.random() * 30),
+            };
+            appModulesConfig.forEach(module => {
+                const card = document.createElement('div');
+                card.className = `bg-white rounded-xl p-4 shadow-md border border-gray-200 hover:shadow-lg transition-all duration-300 cursor-pointer focus:outline-none focus:ring-2 focus:ring-${module.color}-500`;
+                card.setAttribute('role', 'button');
+                card.setAttribute('tabindex', '0');
+                card.setAttribute('aria-label', `Go to ${module.name}`);
+                card.onclick = () => navigateTo(module.id);
+                card.onkeypress = e => { if (e.key === 'Enter' || e.key === ' ') navigateTo(module.id); };
+                const cardContent = document.createElement('div');
+                cardContent.className = 'flex items-start space-x-3';
+                const iconDiv = document.createElement('div');
+                iconDiv.className = `h-10 w-10 rounded-full flex items-center justify-center text-xl bg-gray-100 text-${module.color}-600`;
+                iconDiv.textContent = module.icon;
+                const textDiv = document.createElement('div');
+                const title = document.createElement('h3');
+                title.className = 'text-lg font-semibold text-gray-800';
+                title.textContent = module.name;
+                textDiv.appendChild(title);
+                if (module.statKey && dynamicStats[module.statKey]) {
+                    const statText = document.createElement('p');
+                    statText.className = 'text-sm text-gray-500';
+                    statText.textContent = `${module.statLabel}: ${dynamicStats[module.statKey]}`;
+                    textDiv.appendChild(statText);
+                }
+                cardContent.appendChild(iconDiv);
+                cardContent.appendChild(textDiv);
+                card.appendChild(cardContent);
+                dashboardGrid.appendChild(cardContent);
+            });
+        }
+
+        // --- Chart Rendering Functions ---
+        function renderAnalyticsCharts() {
+            const userActivityCtx = document.getElementById('userActivityChart')?.getContext('2d');
+            if (userActivityCtx) {
+                if (activeCharts['userActivityChart']) {
+                    activeCharts['userActivityChart'].destroy();
+                }
+                activeCharts['userActivityChart'] = new Chart(userActivityCtx, {
+                    type: 'line',
+                    data: {
+                        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
+                        datasets: [{
+                            label: 'Active Users',
+                            data: [65, 59, 80, 81, 56, 55, 40],
+                            fill: false,
+                            borderColor: 'rgb(75, 192, 192)',
+                            tension: 0.1
+                        }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false }
+                });
+            }
+            const featureUsageCtx = document.getElementById('featureUsageChart')?.getContext('2d');
+            if (featureUsageCtx) {
+                if (activeCharts['featureUsageChart']) {
+                    activeCharts['featureUsageChart'].destroy();
+                }
+                activeCharts['featureUsageChart'] = new Chart(featureUsageCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Feature A', 'Feature B', 'Feature C'],
+                        datasets: [{
+                            label: 'Feature Usage',
+                            data: [300, 50, 100],
+                            backgroundColor: [
+                                'rgb(255, 99, 132)',
+                                'rgb(54, 162, 235)',
+                                'rgb(255, 205, 86)'
+                            ],
+                            hoverOffset: 4
+                        }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false }
+                });
+            }
+        }
+
+        function renderWorkStatusCharts() {
+            const projectProgressCtx = document.getElementById('projectProgressChart')?.getContext('2d');
+            if (projectProgressCtx) {
+                if (activeCharts['projectProgressChart']) {
+                    activeCharts['projectProgressChart'].destroy();
+                }
+                activeCharts['projectProgressChart'] = new Chart(projectProgressCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Project Alpha', 'Project Beta', 'Project Gamma', 'Project Delta'],
+                        datasets: [{
+                            label: '% Complete',
+                            data: [75, 50, 90, 60],
+                            backgroundColor: [
+                                'rgba(54, 162, 235, 0.6)',
+                                'rgba(255, 206, 86, 0.6)',
+                                'rgba(75, 192, 192, 0.6)',
+                                'rgba(153, 102, 255, 0.6)'
+                            ],
+                            borderColor: [
+                                'rgba(54, 162, 235, 1)',
+                                'rgba(255, 206, 86, 1)',
+                                'rgba(75, 192, 192, 1)',
+                                'rgba(153, 102, 255, 1)'
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: { y: { beginAtZero: true, max: 100 } }
+                    }
+                });
+            }
+            const taskDistributionCtx = document.getElementById('taskDistributionChart')?.getContext('2d');
+            if (taskDistributionCtx) {
+                if (activeCharts['taskDistributionChart']) {
+                    activeCharts['taskDistributionChart'].destroy();
+                }
+                activeCharts['taskDistributionChart'] = new Chart(taskDistributionCtx, {
+                    type: 'pie',
+                    data: {
+                        labels: ['To Do', 'In Progress', 'Completed'],
+                        datasets: [{
+                            label: 'Tasks',
+                            data: [120, 190, 300],
+                            backgroundColor: [
+                                'rgb(255, 159, 64)',
+                                'rgb(75, 192, 192)',
+                                'rgb(153, 102, 255)'
+                            ],
+                            hoverOffset: 4
+                        }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false }
+                });
+            }
+        }
+
+        function renderReportsCharts() {
+            const monthlyRevenueCtx = document.getElementById('monthlyRevenueChart')?.getContext('2d');
+            if (monthlyRevenueCtx) {
+                if (activeCharts['monthlyRevenueChart']) {
+                    activeCharts['monthlyRevenueChart'].destroy();
+                }
+                activeCharts['monthlyRevenueChart'] = new Chart(monthlyRevenueCtx, {
+                    type: 'line',
+                    data: {
+                        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                        datasets: [{
+                            label: 'Revenue ($K)',
+                            data: [120, 150, 130, 180, 200, 190],
+                            borderColor: 'rgb(255, 99, 132)',
+                            backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                            fill: true,
+                            tension: 0.2
+                        }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false }
+                });
+            }
+            const departmentPerformanceCtx = document.getElementById('departmentPerformanceChart')?.getContext('2d');
+            if (departmentPerformanceCtx) {
+                if (activeCharts['departmentPerformanceChart']) {
+                    activeCharts['departmentPerformanceChart'].destroy();
+                }
+                activeCharts['departmentPerformanceChart'] = new Chart(departmentPerformanceCtx, {
+                    type: 'radar',
+                    data: {
+                        labels: ['Sales', 'Marketing', 'Dev', 'Support', 'HR'],
+                        datasets: [{
+                            label: 'Q1 Performance',
+                            data: [70, 85, 75, 60, 80],
+                            fill: true,
+                            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                            borderColor: 'rgb(54, 162, 235)',
+                            pointBackgroundColor: 'rgb(54, 162, 235)',
+                            pointBorderColor: '#fff',
+                            pointHoverBackgroundColor: '#fff',
+                            pointHoverBorderColor: 'rgb(54, 162, 235)'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: { r: { angleLines: { display: false }, suggestedMin: 0, suggestedMax: 100 } }
+                    }
+                });
+            }
+        }
+
+        // --- Navigation ---
+        function navigateTo(pageId, isInitialLoad = false) {
+            if (!pageId) pageId = 'home';
+            const pageWrapper = document.querySelector('.content-page-wrapper > div');
+            contentPages.forEach(p => p.classList.remove('page-enter-animation'));
+            contentPages.forEach(page => page.classList.add('hidden'));
+            const targetPage = document.getElementById(pageId);
+            const targetLink = document.querySelector(`.nav-link[data-page-id="${pageId}"]`);
+            const pageTitle = targetLink?.querySelector('span')?.textContent || pageId.charAt(0).toUpperCase() + pageId.slice(1).replace(/-/g, ' ');
+            if (targetPage) {
+                targetPage.classList.remove('hidden');
+                targetPage.classList.add('page-enter-animation');
+                if (currentPageTitleElement) currentPageTitleElement.textContent = pageTitle;
+                if (pageWrapper) {
+                    pageWrapper.classList.remove('bg-slate-100', 'bg-white');
+                    if (pageId === 'home' || pageId === 'settings') {
+                        pageWrapper.classList.add('bg-slate-100');
+                    } else {
+                        pageWrapper.classList.add('bg-white');
+                    }
+                }
+                if (pageId === 'home') {
+                    renderDashboard();
+                } else if (pageId === 'analytics') {
+                    renderAnalyticsCharts();
+                } else if (pageId === 'work-status') {
+                    renderWorkStatusCharts();
+                } else if (pageId === 'reports') {
+                    renderReportsCharts();
+                } else if (pageId === 'settings') {
+                    populateAllSourceCode();
+                }
+            }
+            window.location.hash = `#${pageId}`;
+        }
+
+        // --- Initialization ---
+        window.addEventListener('hashchange', () => {
+            const pageId = window.location.hash.substring(1);
+            navigateTo(pageId);
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const initialPageId = window.location.hash.substring(1) || 'home';
+            navigateTo(initialPageId, true);
+        });
+    </script>
+    <script src="index.tsx" type="module"></script>
+</body>
+</html>
